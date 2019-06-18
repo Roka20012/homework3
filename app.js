@@ -10,12 +10,15 @@ GAME RULES:
 */
 
 const RESET_VALUE = 2;
+const DEFAULT_WIN_SCORES = 100;
 
 let scores = [0, 0];
 let activePlayer = 0;
 let current = 0;
+let manualWinScores;
 const diceElement1 = document.querySelector('.dice-1');
 const diceElement2 = document.querySelector('.dice-2');
+const inputWinScores = document.querySelector('.input-scores');
 
 const initGame = () => {
   document.querySelector('#current-0').textContent = 0;
@@ -41,7 +44,7 @@ document.querySelector('.btn-roll').addEventListener('click', function() {
     current += dice1 + dice2;
     document.getElementById('current-'+activePlayer).textContent = current;
 
-    if (scores[activePlayer] + current >= 20) {
+    if (scores[activePlayer] + current >= (manualWinScores || DEFAULT_WIN_SCORES)) {
       alert(`Player ${activePlayer} won!!!`);
     }
     
@@ -70,3 +73,7 @@ document.querySelector('.btn-hold').addEventListener('click', function() {
 document.querySelector('.btn-new').addEventListener('click', function() {
   initGame();
 });
+
+const setWinScores = ({target}) => manualWinScores = target.valueAsNumber;
+
+inputWinScores.addEventListener("keyup", setWinScores);
