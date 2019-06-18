@@ -9,6 +9,14 @@ GAME RULES:
 
 */
 
+Storage.prototype.setObj = function(key, obj) {
+    return this.setItem(key, JSON.stringify(obj));
+}
+
+Storage.prototype.getObj = function(key) {
+    return JSON.parse(this.getItem(key));
+}
+
 const RESET_VALUE = 2;
 const DEFAULT_WIN_SCORES = 100;
 
@@ -18,6 +26,7 @@ const diceElement2 = document.querySelector('.dice-2');
 const inputWinScores = document.querySelector('.input-scores');
 const player1Element = document.getElementById("name-0");
 const player2Element = document.getElementById("name-1");
+const showWinnersBtn = document.querySelector(".show-winners");
 
 function Gamer() {
   let _score = 0;
@@ -44,10 +53,7 @@ const initGame = () => {
     inputWinScores.disabled = !inputWinScores.disabled;
   } 
 
-  player1.name = prompt("Enter player1 name:", "Vitalik") || "Игрок 1";
-  player2.name = prompt("Enter player2 name:", "Bro") || "Игрок 2";
-  player1Element.textContent = player1.name;
-  player2Element.textContent = player2.name;
+  askSetPlayersNames();
   player1.resetScore();
   player2.resetScore();
   manualWinScores = 0;
@@ -55,12 +61,44 @@ const initGame = () => {
   activePlayer = 0;
   scores = [0, 0];
 
+  document.querySelector(`.player-0-panel`).classList.add('active');
+  document.querySelector(`.player-1-panel`).classList.remove('active');
+
   document.querySelector('#current-0').textContent = 0;
   document.querySelector('#current-1').textContent = 0;
   document.querySelector('#score-0').textContent = 0;
   document.querySelector('#score-1').textContent = 0;
   diceElement1.style.display = 'none';
   diceElement2.style.display = 'none';
+}
+
+const askSetPlayersNames = _ => {
+  let winners = localStorage.getObj("winners") ? localStorage.getObj("winners") : false;
+
+  player1.name = prompt("Enter player1 name:", "Vitalik") || "Игрок 1";
+  while(!!winners[player1.name]) {
+    if(confirm(player1.name + " already exist, it is you?")) break;
+    player1.name = prompt("Enter player1 name:", "Vitalik") || "Игрок 1";
+  }
+    
+  player2.name = prompt("Enter player2 name:", "Bro") || "Игрок 2";
+  while(!!winners[player2.name]) {
+    if(confirm(player2.name + " already exist, it is you?")) break;
+    
+    player2.name = prompt("Enter player2 name:", "Vitalik") || "Игрок 2";
+  }
+
+  while(player1.name === player2.name) {
+      player2.name = prompt("Can not be two " + player1.name + " enter new name", "") || "Player2";
+      while(!!winners[player2.name]) {
+        if(confirm(player2.name + " already exist, it is you?")) break;
+        
+        player2.name = prompt("Enter player2 name:", "Bro") || "Игрок 2";
+      }
+  }
+
+  player1Element.textContent = player1.name;
+  player2Element.textContent = player2.name;
 }
 
 initGame();
@@ -89,7 +127,25 @@ document.querySelector('.btn-roll').addEventListener('click', function() {
     }
 
     if (scores[activePlayer] + current >= (manualWinScores || DEFAULT_WIN_SCORES)) {
-      activePlayer ? alert(`Player ${player2.name} won!!!`) : alert(`Player ${player1.name} won!!!`);
+      activePlayer ? winner = player2 : winner = player1;
+      let winnerName = winner.name;
+      winner.winCount ? winner.winCount++ : winner.winCount = 1;
+
+      if(localStorage.getObj("winners")) {
+        let winners = localStorage.getObj("winners");
+        
+        console.log(winner.winCount);
+        console.log("winner", winnerName);
+        winners[winnerName] = winners[winnerName] ? ++winners[winnerName] : winner.winCount;
+        console.log("winners", winners);
+        localStorage.setObj("winners", winners);
+      } else {
+        let winners = {};
+        winners[winnerName] = winner.winCount;
+        localStorage.setObj("winners", winners);
+      }
+
+      alert(`${winner.name} won!!!`);
       initGame();
     }
     
@@ -114,6 +170,10 @@ const changePlayer = () => {
 }
 
 document.querySelector('.btn-hold').addEventListener('click', function() {
+  if(!inputWinScores.disabled) {
+    inputWinScores.disabled = !inputWinScores.disabled;
+  }
+
   scores[activePlayer] += current;
   activePlayer ? player2.setScore(scores[activePlayer]) : player1.setScore(scores[activePlayer]);
   let allScore = activePlayer ? player2.getScore() : player1.getScore();
@@ -127,5 +187,19 @@ document.querySelector('.btn-new').addEventListener('click', function() {
 });
 
 const setWinScores = ({target}) => manualWinScores = target.valueAsNumber;
+const showWinners = _ => { 
+  let winners = localStorage.getObj("winners") ? localStorage.getObj("winners") : false;
+  let winnersList = "";
+
+  if(!winners) {
+    alert("Nothing to show");
+  } else {
+    for(let key in winners) {
+      winnersList += `${key} win ${winners[key]} times\n`;
+    }
+    alert(winnersList);
+  }
+};
 
 inputWinScores.addEventListener("keyup", setWinScores);
+showWinnersBtn.addEventListener("click", showWinners);

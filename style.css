@@ -176,3 +176,23 @@ i {
     -webkit-appearance: none;
     margin: 0;
 }
+
+.show-winners {
+    width: 250px;
+    padding: 10px 20px;
+    position: absolute;
+    bottom: 23px;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    font-family: Lato;
+    font-weight: bold;
+    border: 2px solid orange;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: all ease .2s;
+}
+
+.show-winners:hover {
+    background-color: orange;
+    color: white;
+}
