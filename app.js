@@ -12,15 +12,49 @@ GAME RULES:
 const RESET_VALUE = 2;
 const DEFAULT_WIN_SCORES = 100;
 
-let scores = [0, 0];
-let activePlayer = 0;
-let current = 0;
-let manualWinScores;
+let scores, activePlayer, current, manualWinScores;
 const diceElement1 = document.querySelector('.dice-1');
 const diceElement2 = document.querySelector('.dice-2');
 const inputWinScores = document.querySelector('.input-scores');
+const player1Element = document.getElementById("name-0");
+const player2Element = document.getElementById("name-1");
+
+function Gamer() {
+  let _score = 0;
+
+  this.getScore = function() {
+    return _score;
+  }
+
+  this.setScore = function(score) {
+    _score = score;
+  }
+
+  this.resetScore = function() {
+    _score = 0;
+  }
+}
+
+let player1 = new Gamer();
+let player2 = new Gamer();
 
 const initGame = () => {
+  if(inputWinScores.disabled) {
+    inputWinScores.value = "";
+    inputWinScores.disabled = !inputWinScores.disabled;
+  } 
+
+  player1.name = prompt("Enter player1 name:", "Vitalik") || "Игрок 1";
+  player2.name = prompt("Enter player2 name:", "Bro") || "Игрок 2";
+  player1Element.textContent = player1.name;
+  player2Element.textContent = player2.name;
+  player1.resetScore();
+  player2.resetScore();
+  manualWinScores = 0;
+  current = 0;
+  activePlayer = 0;
+  scores = [0, 0];
+
   document.querySelector('#current-0').textContent = 0;
   document.querySelector('#current-1').textContent = 0;
   document.querySelector('#score-0').textContent = 0;
@@ -32,6 +66,10 @@ const initGame = () => {
 initGame();
 
 document.querySelector('.btn-roll').addEventListener('click', function() {
+  if(!inputWinScores.disabled) {
+    inputWinScores.disabled = !inputWinScores.disabled;
+  } 
+
   let dice1 = Math.floor(Math.random() * 6) + 1;
   let dice2 = Math.floor(Math.random() * 6) + 1;
 
@@ -44,11 +82,23 @@ document.querySelector('.btn-roll').addEventListener('click', function() {
     current += dice1 + dice2;
     document.getElementById('current-'+activePlayer).textContent = current;
 
+    if(activePlayer) {
+      player2.setScore(scores[activePlayer] + current);
+    } else {
+      player1.setScore(scores[activePlayer] + current);
+    }
+
     if (scores[activePlayer] + current >= (manualWinScores || DEFAULT_WIN_SCORES)) {
-      alert(`Player ${activePlayer} won!!!`);
+      activePlayer ? alert(`Player ${player2.name} won!!!`) : alert(`Player ${player1.name} won!!!`);
+      initGame();
     }
     
   } else {
+    if(activePlayer) {
+      player2.setScore(scores[activePlayer]);
+    } else {
+      player1.setScore(scores[activePlayer]);
+    }
     changePlayer();
   }
 });
@@ -65,7 +115,9 @@ const changePlayer = () => {
 
 document.querySelector('.btn-hold').addEventListener('click', function() {
   scores[activePlayer] += current;
-  document.querySelector(`#score-${activePlayer}`).textContent = scores[activePlayer];
+  activePlayer ? player2.setScore(scores[activePlayer]) : player1.setScore(scores[activePlayer]);
+  let allScore = activePlayer ? player2.getScore() : player1.getScore();
+  document.querySelector(`#score-${activePlayer}`).textContent = allScore;
   changePlayer();
 });
 
