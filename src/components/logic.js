@@ -115,12 +115,9 @@ function gameLogic() {
             if (localStorage.getObj("winners")) {
                 let winners = localStorage.getObj("winners");
 
-                console.log(winner.winCount);
-                console.log("winner", winnerName);
                 winners[winnerName] = winners[winnerName]
                     ? ++winners[winnerName]
                     : winner.winCount;
-                console.log("winners", winners);
                 localStorage.setObj("winners", winners);
             } else {
                 let winners = {};
