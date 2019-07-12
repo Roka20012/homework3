@@ -140,11 +140,59 @@ i {
 .dice {
     position: absolute;
     left: 50%;
-    top: 178px;
+    top: 108px;
     transform: translateX(-50%);
     height: 100px;
     box-shadow: 0px 10px 60px rgba(0, 0, 0, 0.10);
 }
 
+.dice-2 {
+    top: 258px;
+}
+
 .winner { background-color: #f7f7f7; }
 .winner .player-name { font-weight: 300; color: #EB4D4D; }
+
+.input-scores {
+    width: 110px;
+    padding: 10px 10px;
+    position: absolute;
+    bottom: -18px;
+    text-align: center;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Lato;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    font-weight: bold;
+    display: inline-block;
+    border: 2px solid orange;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.input-scores::-webkit-inner-spin-button,
+.input-scores::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.show-winners {
+    width: 250px;
+    padding: 10px 20px;
+    position: absolute;
+    bottom: 23px;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    font-family: Lato;
+    font-weight: bold;
+    border: 2px solid orange;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: all ease .2s;
+}
+
+.show-winners:hover {
+    background-color: orange;
+    color: white;
+}
